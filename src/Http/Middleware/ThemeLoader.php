@@ -14,8 +14,11 @@ class ThemeLoader
      */
     public function handle(Request $request, \Closure $next, ?string $theme = null)
     {
-        // Do not load theme if API request or App is running in console
-        if ($request->expectsJson() || app()->runningInConsole()) {
+        // Do not load theme if the App is running in console. The Accept header
+        // is not a reliable signal: a client that asks for JSON can still hit a
+        // route that renders theme views, and skipping the theme leaves them
+        // unresolvable ("View [layouts.app] not found").
+        if (app()->runningInConsole()) {
             return $next($request);
         }
 
